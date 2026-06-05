@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Berber Randevu Sistemi</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0F0E0C;color:#E8E0D0;font-family:'DM Sans',sans-serif;min-height:100vh}
+h1,h2,h3{font-family:'Playfair Display',serif}
+.screen{display:none;min-height:100vh;padding:20px;max-width:480px;margin:0 auto}
+.screen.active{display:block}
+.btn-gold{background:#C9A84C;color:#0F0E0C;border:none;border-radius:14px;padding:16px;font-size:16px;font-weight:700;cursor:pointer;width:100%;font-family:'DM Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-outline{background:rgba(232,224,208,0.05);color:#E8E0D0;border:1px solid rgba(232,224,208,0.15);border-radius:14px;padding:16px;font-size:15px;cursor:pointer;width:100%;font-family:'DM Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-back{background:none;border:none;color:#C9A84C;cursor:pointer;font-size:26px;padding:4px 8px}
+.card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:18px;margin-bottom:12px;cursor:pointer}
+.card:active{background:rgba(201,168,76,0.1);border-color:#C9A84C}
+.card-row{display:flex;align-items:center;gap:14px}
+.avatar{width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#fff;font-family:'Playfair Display',serif;flex-shrink:0}
+.progress-bar{height:3px;background:#1e1d19;margin:12px 0 20px;border-radius:2px}
+.progress-fill{height:100%;background:linear-gradient(90deg,#C9A84C,#e8c96d);border-radius:2px}
+.header-row{display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-top:10px}
+.divider{width:80px;height:2px;background:linear-gradient(90deg,transparent,#C9A84C,transparent);margin:14px auto}
+.services-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.svc-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:16px;cursor:pointer;text-align:center}
+.svc-card:active{background:rgba(201,168,76,0.1);border-color:#C9A84C}
+.week-scroll{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:16px}
+.day-pill{flex-shrink:0;width:48px;padding:10px 0;border-radius:12px;border:1px solid rgba(255,255,255,0.08);background:transparent;color:#E8E0D0;cursor:pointer;text-align:center;font-family:'DM Sans',sans-serif}
+.day-active{border-color:#C9A84C!important;background:rgba(201,168,76,0.15)!important;color:#C9A84C!important}
+.day-past{color:#3a3830!important;cursor:not-allowed!important}
+.slots-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.slot{padding:10px 0;border-radius:10px;border:1px solid rgba(255,255,255,0.1);background:transparent;color:#E8E0D0;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;text-align:center}
+.slot-active{border-color:#C9A84C!important;background:rgba(201,168,76,0.15)!important;color:#C9A84C!important}
+.slot-taken{border-color:rgba(255,255,255,0.04)!important;background:rgba(255,255,255,0.02)!important;color:#3a3830!important;cursor:not-allowed!important;text-decoration:line-through}
+.input-wrap{margin-bottom:14px}
+.input-label{font-size:12px;color:#5a5040;letter-spacing:.1em;margin-bottom:7px;display:block}
+.input-field{width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:14px 16px;color:#E8E0D0;font-family:'DM Sans',sans-serif;font-size:15px;outline:none}
+.input-field:focus{border-color:#C9A84C}
+.summary-box{background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.15);border-radius:14px;padding:16px;margin-bottom:16px}
+.summary-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:14px}
+.summary-row:last-child{border-bottom:none}
+.notify-box{background:rgba(201,168,76,0.05);border:1px solid rgba(201,168,76,0.1);border-radius:12px;padding:14px;margin-bottom:16px;font-size:13px;color:#8a8070}
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.mini-stat{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:12px;text-align:center}
+.mini-num{font-family:'Playfair Display',serif;font-size:26px;color:#C9A84C;font-weight:700}
+.mini-lbl{font-size:10px;color:#5a5040;letter-spacing:.08em;margin-top:2px}
+.tabs{display:flex;border-bottom:1px solid rgba(255,255,255,0.06);margin-bottom:14px}
+.tab{flex:1;padding:11px 0;background:none;border:none;border-bottom:2px solid transparent;color:#5a5040;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:14px}
+.tab-active{border-bottom-color:#C9A84C!important;color:#C9A84C!important;font-weight:600!important}
+.filter-row{display:flex;gap:8px;overflow-x:auto;margin-bottom:14px;padding-bottom:4px}
+.filter-btn{flex-shrink:0;padding:6px 14px;border-radius:20px;border:1px solid rgba(255,255,255,0.08);background:transparent;color:#8a8070;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px}
+.filter-active{border-color:#C9A84C!important;background:rgba(201,168,76,0.12)!important;color:#C9A84C!important}
+.app-card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:14px;margin-bottom:10px}
+.app-card-pending{border-color:rgba(201,168,76,0.3)!important}
+.app-row{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.app-actions{display:flex;gap:6px;flex-shrink:0}
+.btn-del{background:rgba(155,34,38,0.15);border:1px solid rgba(155,34,38,0.4);border-radius:8px;padding:6px 10px;color:#e63946;cursor:pointer;font-size:13px}
+.badge-confirmed{background:rgba(45,106,79,0.15);color:#52b788;border-radius:6px;padding:2px 7px;font-size:11px}
+.badge-pending{background:rgba(201,168,76,0.15);color:#C9A84C;border-radius:6px;padding:2px 7px;font-size:11px}
+.week-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.week-nav button{background:none;border:1px solid rgba(255,255,255,0.1);color:#E8E0D0;border-radius:8px;padding:6px 14px;cursor:pointer;font-size:18px}
+.toast{position:fixed;bottom:20px;left:16px;right:16px;max-width:400px;margin:0 auto;z-index:9999;border-radius:14px;padding:14px 18px;font-size:14px;font-weight:500;box-shadow:0 8px 32px rgba(0,0,0,0.3);display:none;text-align:center}
+.toast-success{background:#2D6A4F;color:#fff}
+.toast-error{background:#9B2226;color:#fff}
+.toast-info{background:#1D3557;color:#fff}
+.empty{text-align:center;padding:40px 0;color:#3a3830;font-size:14px}
+.loading{text-align:center;padding:40px 0;color:#8a8070;font-size:14px}
+</style>
+</head>
+<body>
+
+<div id="s-home" class="screen active">
+  <div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 20px">
+    <div style="font-size:52px;margin-bottom:14px">💈</div>
+    <h1 style="font-size:clamp(38px,10vw,72px);font-weight:900;color:#C9A84C;line-height:1;letter-spacing:-1px">BERBER</h1>
+    <h2 style="font-size:clamp(13px,3.5vw,20px);font-weight:400;color:#E8E0D0;letter-spacing:.3em;margin-bottom:8px">RANDEVU SİSTEMİ</h2>
+    <div class="divider"></div>
+    <p style="color:#5a5040;font-size:13px;letter-spacing:.1em;margin-bottom:48px">PROFESYONEL BERBER HİZMETLERİ</p>
+    <div style="width:100%;max-width:340px;display:flex;flex-direction:column;gap:14px">
+      <button class="btn-gold" id="btn-book">📅 Randevu Al</button>
+      <button class="btn-outline" id="btn-admin">⚙️ Yönetim Paneli</button>
+    </div>
+    <div style="margin-top:48px">
+      <p style="color:#3a3830;font-size:11px;letter-spacing:.2em;margin-bottom:18px">USTALARIMIZ</p>
+      <div style="display:flex;gap:24px;justify-content:center" id="home-barbers"></div>
+    </div>
+  </div>
+</div>
+
+<div id="s-b1" class="screen">
+  <div class="header-row"><button class="btn-back" data-go="s-home">‹</button><h2 style="font-size:22px">Berber Seç</h2><span style="font-size:12px;color:#5a5040;margin-left:auto">1/4</span></div>
+  <div class="progress-bar"><div class="progress-fill" style="width:25%"></div></div>
+  <p style="color:#8a8070;font-size:13px;margin-bottom:18px">Size en uygun ustayı seçin</p>
+  <div id="barber-list"></div>
+</div>
+
+<div id="s-b2" class="screen">
+  <div class="header-row"><button class="btn-back" data-go="s-b1">‹</button><h2 style="font-size:22px">Hizmet Seç</h2><span style="font-size:12px;color:#5a5040;margin-left:auto">2/4</span></div>
+  <div class="progress-bar"><div class="progress-fill" style="width:50%"></div></div>
+  <p style="color:#8a8070;font-size:13px;margin-bottom:18px">Almak istediğiniz hizmeti seçin</p>
+  <div class="services-grid" id="service-list"></div>
+</div>
+
+<div id="s-b3" class="screen">
+  <div class="header-row"><button class="btn-back" data-go="s-b2">‹</button><h2 style="font-size:22px">Tarih & Saat</h2><span style="font-size:12px;color:#5a5040;margin-left:auto">3/4</span></div>
+  <div class="progress-bar"><div class="progress-fill" style="width:75%"></div></div>
+  <div class="week-nav"><button id="prev-week">‹</button><span style="font-size:13px;color:#8a8070" id="week-label"></span><button id="next-week">›</button></div>
+  <div class="week-scroll" id="week-days"></div>
+  <p style="font-size:12px;color:#5a5040;letter-spacing:.1em;margin-bottom:10px" id="slots-label">SAAT SEÇİN</p>
+  <div class="slots-grid" id="slots-grid"></div>
+</div>
+
+<div id="s-b4" class="screen">
+  <div class="header-row"><button class="btn-back" data-go="s-b3">‹</button><h2 style="font-size:22px">Bilgileriniz</h2><span style="font-size:12px;color:#5a5040;margin-left:auto">4/4</span></div>
+  <div class="progress-bar"><div class="progress-fill" style="width:100%"></div></div>
+  <div class="summary-box" id="booking-summary"></div>
+  <div class="input-wrap"><label class="input-label">👤 AD SOYAD</label><input class="input-field" id="inp-name" type="text" placeholder="Adınız Soyadınız"></div>
+  <div class="input-wrap"><label class="input-label">📞 TELEFON</label><input class="input-field" id="inp-phone" type="tel" placeholder="05XX XXX XX XX"></div>
+  <div class="notify-box">🔔 Randevunuzdan 1 saat önce hatırlatma yapılacaktır</div>
+  <button class="btn-gold" id="confirm-btn">✅ Randevuyu Onayla</button>
+</div>
+
+<div id="s-b5" class="screen">
+  <div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px">
+    <div style="width:72px;height:72px;border-radius:50%;background:rgba(45,106,79,0.2);border:2px solid #2D6A4F;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:30px">✓</div>
+    <h2 style="font-size:28px;margin-bottom:8px;text-align:center">Randevu Onaylandı!</h2>
+    <p style="color:#8a8070;font-size:14px;margin-bottom:28px;text-align:center">Görüşmek üzere! 💈</p>
+    <div class="summary-box" style="width:100%;max-width:340px" id="confirm-summary"></div>
+    <button class="btn-gold" style="max-width:340px;margin-top:20px" data-go="s-home" id="success-home">🏠 Ana Sayfa</button>
+  </div>
+</div>
+
+<div id="s-login" class="screen">
+  <div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px">
+    <div style="font-size:40px;margin-bottom:16px">🔒</div>
+    <h2 style="font-size:24px;margin-bottom:8px;text-align:center">Yönetim Girişi</h2>
+    <p style="color:#8a8070;font-size:13px;margin-bottom:28px;text-align:center">Devam etmek için şifre girin</p>
+    <div style="width:100%;max-width:340px">
+      <input class="input-field" id="inp-pw" type="password" placeholder="Şifre" style="margin-bottom:14px;text-align:center">
+      <button class="btn-gold" id="login-btn">Giriş Yap</button>
+      <button class="btn-back" style="width:100%;margin-top:14px;font-size:14px" data-go="s-home">‹ Geri</button>
+    </div>
+  </div>
+</div>
+
+<div id="s-admin" class="screen">
+  <div class="header-row"><button class="btn-back" data-go="s-home">🏠</button><h2 style="font-size:22px">Yönetim Paneli</h2><span id="pending-badge" style="margin-left:auto"></span></div>
+  <div class="stats-grid" id="admin-stats"></div>
+  <div class="filter-row" id="admin-filters"></div>
+  <div class="tabs">
+    <button class="tab tab-active" data-tab="today">Bugün</button>
+    <button class="tab" data-tab="calendar">Takvim</button>
+    <button class="tab" data-tab="all">Tümü</button>
+  </div>
+  <div id="admin-content"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function(){
+  // ── AYARLAR ──────────────────────────────────────────────────────────────
+  var SUPABASE_URL = "https://rgsavtgfyjmzoqajphge.supabase.co";
+  var SUPABASE_KEY = "sb_publishable_UpyeXnJ6NuoBw57-_4Fd_Q_t2COQVXe";
+  var ADMIN_PASSWORD = "1234";
+
+  var BARBERS = [
+    {id:1,name:"Mehmet Usta",avatar:"M",color:"#C9A84C",specialty:"Saç & Sakal"},
+    {id:2,name:"Ali Bey",avatar:"A",color:"#6B8F71",specialty:"Klasik Kesim"},
+    {id:3,name:"Kerem",avatar:"K",color:"#7B6FA0",specialty:"Modern Stil"}
+  ];
+  var SERVICES = [
+    {id:1,name:"Saç Kesimi",duration:30,price:150,icon:"✂️"},
+    {id:2,name:"Sakal Düzeltme",duration:20,price:80,icon:"🪒"},
+    {id:3,name:"Saç + Sakal",duration:50,price:210,icon:"💈"},
+    {id:4,name:"Çocuk Kesimi",duration:25,price:100,icon:"👦"},
+    {id:5,name:"Fön & Şekil",duration:30,price:120,icon:"💨"},
+    {id:6,name:"Cilt Bakımı",duration:40,price:180,icon:"🌿"}
+  ];
+  // ─────────────────────────────────────────────────────────────────────────
+
+  var HOURS=["09:00","09:30","10:00","10:30","11:00","11:30","12:00","12:30","13:00","13:30","14:00","14:30","15:00","15:30","16:00","16:30","17:00","17:30","18:00","18:30","19:00"];
+  var DAYS=["Paz","Pzt","Sal","Çar","Per","Cum","Cmt"];
+  var MONTHS=["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"];
+
+  var db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  var appointments=[];
+  var sel={barberId:null,serviceId:null,date:todayStr(),time:null};
+  var weekBase=todayStr(), adminFilter=0, adminTab='today', adminWeekBase=todayStr();
+
+  function todayStr(){ return new Date().toISOString().split('T')[0]; }
+  function fmtDate(s){ var d=new Date(s); return d.getDate()+' '+MONTHS[d.getMonth()]+' '+d.getFullYear(); }
+  function getWeek(base){ var days=[]; var s=new Date(base); s.setDate(s.getDate()-s.getDay()); for(var i=0;i<7;i++){ var d=new Date(s); d.setDate(s.getDate()+i); days.push(d.toISOString().split('T')[0]); } return days; }
+  function byId(id){return document.getElementById(id);}
+  function barberById(id){for(var i=0;i<BARBERS.length;i++)if(BARBERS[i].id===id)return BARBERS[i];return null;}
+  function serviceById(id){for(var i=0;i<SERVICES.length;i++)if(SERVICES[i].id===id)return SERVICES[i];return null;}
+
+  function showScreen(id){
+    var s=document.querySelectorAll('.screen');
+    for(var i=0;i<s.length;i++) s[i].classList.remove('active');
+    byId(id).classList.add('active');
+    window.scrollTo(0,0);
+  }
+
+  function loadAppointments(cb){
+    db.from('randevular').select('*').then(function(res){
+      if(res.error){ console.error(res.error); appointments=[]; }
+      else { appointments=res.data.map(function(r){return {id:r.id,barberId:r.barber_id,serviceId:r.service_id,date:r.date,time:r.time,name:r.name,phone:r.phone,status:r.status};}); }
+      if(cb) cb();
+    });
+  }
+
+  // ── HOME ───────────────────────────────────────────────────────────────────
+  function renderHome(){
+    var h='';
+    for(var i=0;i<BARBERS.length;i++){var b=BARBERS[i];
+      h+='<div style="text-align:center"><div class="avatar" style="background:'+b.color+';margin:0 auto 8px">'+b.avatar+'</div><div style="font-size:12px">'+b.name+'</div><div style="font-size:11px;color:#5a5040">'+b.specialty+'</div></div>';}
+    byId('home-barbers').innerHTML=h;
+  }
+
+  function goBook(){ sel={barberId:null,serviceId:null,date:todayStr(),time:null}; renderBarbers(); showScreen('s-b1'); }
+
+  function renderBarbers(){
+    var h='';
+    for(var i=0;i<BARBERS.length;i++){var b=BARBERS[i];
+      h+='<div class="card card-row" data-barber="'+b.id+'"><div class="avatar" style="background:'+b.color+'">'+b.avatar+'</div><div style="flex:1"><div style="font-family:\'Playfair Display\',serif;font-size:18px">'+b.name+'</div><div style="font-size:13px;color:#8a8070;margin-top:2px">'+b.specialty+'</div></div><span style="color:#5a5040;font-size:22px">›</span></div>';}
+    byId('barber-list').innerHTML=h;
+    var cards=byId('barber-list').querySelectorAll('[data-barber]');
+    for(var j=0;j<cards.length;j++){ cards[j].addEventListener('click',function(){ sel.barberId=parseInt(this.getAttribute('data-barber')); renderServices(); showScreen('s-b2'); }); }
+  }
+
+  function renderServices(){
+    var h='';
+    for(var i=0;i<SERVICES.length;i++){var s=SERVICES[i];
+      h+='<div class="svc-card" data-svc="'+s.id+'"><div style="font-size:26px;margin-bottom:8px">'+s.icon+'</div><div style="font-size:13px;font-weight:600;margin-bottom:4px">'+s.name+'</div><div style="font-size:12px;color:#8a8070">'+s.duration+' dk</div><div style="font-family:\'Playfair Display\',serif;font-size:16px;color:#C9A84C;margin-top:4px">'+s.price+'₺</div></div>';}
+    byId('service-list').innerHTML=h;
+    var cards=byId('service-list').querySelectorAll('[data-svc]');
+    for(var j=0;j<cards.length;j++){ cards[j].addEventListener('click',function(){ sel.serviceId=parseInt(this.getAttribute('data-svc')); weekBase=todayStr(); byId('slots-grid').innerHTML='<div class="loading">Yükleniyor...</div>'; showScreen('s-b3'); loadAppointments(renderDateTime); }); }
+  }
+
+  function renderDateTime(){
+    var week=getWeek(weekBase), today=todayStr();
+    var w0=new Date(week[0]),w6=new Date(week[6]);
+    byId('week-label').textContent=w0.getDate()+' '+MONTHS[w0.getMonth()]+' – '+w6.getDate()+' '+MONTHS[w6.getMonth()];
+    var dh='';
+    for(var i=0;i<week.length;i++){var d=week[i],dt=new Date(d),past=d<today;
+      dh+='<button class="day-pill'+(d===sel.date?' day-active':'')+(past?' day-past':'')+'" '+(past?'disabled':'data-date="'+d+'"')+'><div style="font-size:10px;opacity:.7">'+DAYS[dt.getDay()]+'</div><div style="font-size:18px;font-weight:600">'+dt.getDate()+'</div></button>';}
+    byId('week-days').innerHTML=dh;
+    var dayBtns=byId('week-days').querySelectorAll('[data-date]');
+    for(var x=0;x<dayBtns.length;x++){ dayBtns[x].addEventListener('click',function(){ sel.date=this.getAttribute('data-date'); sel.time=null; renderDateTime(); }); }
+    byId('slots-label').textContent='SAAT SEÇİN — '+fmtDate(sel.date);
+    var taken=[];
+    for(var j=0;j<appointments.length;j++){var a=appointments[j]; if(a.date===sel.date&&a.barberId===sel.barberId&&a.status!=='cancelled') taken.push(a.time);}
+    var sh='';
+    for(var k=0;k<HOURS.length;k++){var hr=HOURS[k],isT=taken.indexOf(hr)>=0;
+      sh+='<button class="slot'+(sel.time===hr?' slot-active':'')+(isT?' slot-taken':'')+'" '+(isT?'disabled':'data-time="'+hr+'"')+'>'+hr+'</button>';}
+    byId('slots-grid').innerHTML=sh;
+    var slotBtns=byId('slots-grid').querySelectorAll('[data-time]');
+    for(var y=0;y<slotBtns.length;y++){ slotBtns[y].addEventListener('click',function(){ sel.time=this.getAttribute('data-time'); renderInfo(); showScreen('s-b4'); }); }
+  }
+
+  function renderInfo(){
+    var b=barberById(sel.barberId),s=serviceById(sel.serviceId);
+    byId('booking-summary').innerHTML='<div class="summary-row"><span style="color:#5a5040">Berber</span><span>'+b.name+'</span></div><div class="summary-row"><span style="color:#5a5040">Hizmet</span><span>'+s.icon+' '+s.name+'</span></div><div class="summary-row"><span style="color:#5a5040">Tarih</span><span>'+fmtDate(sel.date)+'</span></div><div class="summary-row"><span style="color:#5a5040">Saat</span><span>'+sel.time+'</span></div><div class="summary-row"><span style="color:#5a5040">Ücret</span><span style="color:#C9A84C;font-weight:600">'+s.price+'₺</span></div>';
+  }
+
+  function confirmBooking(){
+    var name=byId('inp-name').value.trim(), phone=byId('inp-phone').value.trim();
+    if(!name||!phone){ showToast('Ad ve telefon zorunludur','error'); return; }
+    var btn=byId('confirm-btn'); btn.textContent='Kaydediliyor...'; btn.disabled=true;
+    var b=barberById(sel.barberId),s=serviceById(sel.serviceId);
+    db.from('randevular').insert([{barber_id:sel.barberId,service_id:sel.serviceId,date:sel.date,time:sel.time,name:name,phone:phone,status:'confirmed'}]).then(function(res){
+      btn.textContent='✅ Randevuyu Onayla'; btn.disabled=false;
+      if(res.error){ showToast('Hata: kaydedilemedi','error'); console.error(res.error); return; }
+      byId('confirm-summary').innerHTML='<div class="summary-row"><span style="color:#5a5040">Berber</span><span>'+b.name+'</span></div><div class="summary-row"><span style="color:#5a5040">Hizmet</span><span>'+s.icon+' '+s.name+'</span></div><div class="summary-row"><span style="color:#5a5040">Tarih</span><span>'+fmtDate(sel.date)+'</span></div><div class="summary-row"><span style="color:#5a5040">Saat</span><span>'+sel.time+'</span></div><div class="summary-row"><span style="color:#5a5040">Ad</span><span>'+name+'</span></div><div class="summary-row"><span style="color:#5a5040">Telefon</span><span>'+phone+'</span></div>';
+      byId('inp-name').value=''; byId('inp-phone').value='';
+      showToast('Randevunuz alındı! '+fmtDate(sel.date)+' - '+sel.time,'success');
+      showScreen('s-b5');
+    });
+  }
+
+  // ── ADMIN ──────────────────────────────────────────────────────────────────
+  function goAdmin(){ byId('admin-content').innerHTML='<div class="loading">Yükleniyor...</div>'; showScreen('s-admin'); loadAppointments(renderAdmin); }
+
+  function renderAdmin(){
+    var today=todayStr(), week=getWeek(adminWeekBase), active=[],pending=[];
+    for(var i=0;i<appointments.length;i++){ if(appointments[i].status!=='cancelled') active.push(appointments[i]); if(appointments[i].status==='pending') pending.push(appointments[i]); }
+    byId('pending-badge').innerHTML=pending.length?'<span style="background:#C9A84C;color:#0F0E0C;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700">'+pending.length+' bekleyen</span>':'';
+    var tc=0,wc=0;
+    for(var k=0;k<active.length;k++){ if(active[k].date===today) tc++; if(week.indexOf(active[k].date)>=0) wc++; }
+    byId('admin-stats').innerHTML='<div class="mini-stat"><div class="mini-num">'+tc+'</div><div class="mini-lbl">BUGÜN</div></div><div class="mini-stat"><div class="mini-num">'+wc+'</div><div class="mini-lbl">BU HAFTA</div></div><div class="mini-stat"><div class="mini-num">'+active.length+'</div><div class="mini-lbl">TOPLAM</div></div>';
+    var fh='<button class="filter-btn'+(adminFilter===0?' filter-active':'')+'" data-filter="0">Tümü</button>';
+    for(var m=0;m<BARBERS.length;m++){var b=BARBERS[m]; fh+='<button class="filter-btn'+(adminFilter===b.id?' filter-active':'')+'" data-filter="'+b.id+'">'+b.name+'</button>';}
+    byId('admin-filters').innerHTML=fh;
+    var fbtns=byId('admin-filters').querySelectorAll('[data-filter]');
+    for(var n=0;n<fbtns.length;n++){ fbtns[n].addEventListener('click',function(){ adminFilter=parseInt(this.getAttribute('data-filter')); renderAdmin(); }); }
+    renderAdminContent();
+  }
+
+  function renderAdminContent(){
+    var today=todayStr(), week=getWeek(adminWeekBase), filtered=[];
+    for(var i=0;i<appointments.length;i++){var a=appointments[i]; if(adminFilter===0||a.barberId===adminFilter) filtered.push(a);}
+    var el=byId('admin-content');
+    if(adminTab==='today'){
+      var list=[]; for(var j=0;j<filtered.length;j++) if(filtered[j].date===today&&filtered[j].status!=='cancelled') list.push(filtered[j]);
+      list.sort(function(a,b){return a.time.localeCompare(b.time)});
+      el.innerHTML=list.length?list.map(function(a){return appCard(a,false);}).join(''):'<div class="empty">Bugün randevu yok</div>';
+    } else if(adminTab==='calendar'){
+      var h='<div class="week-nav"><button id="apw">‹</button><span style="font-size:13px;color:#8a8070">Haftalık Takvim</span><button id="anw">›</button></div>';
+      for(var d=0;d<week.length;d++){var day=week[d],dt=new Date(day),dl=[];
+        for(var k=0;k<filtered.length;k++) if(filtered[k].date===day&&filtered[k].status!=='cancelled') dl.push(filtered[k]);
+        dl.sort(function(a,b){return a.time.localeCompare(b.time)});
+        h+='<div style="margin-bottom:12px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-size:12px;color:'+(day===today?'#C9A84C':'#5a5040')+';letter-spacing:.1em">'+DAYS[dt.getDay()].toUpperCase()+' '+dt.getDate()+(day===today?' 🔸':'')+'</span>'+(dl.length?'<div style="flex:1;height:1px;background:rgba(255,255,255,0.05)"></div><span style="font-size:11px;color:#5a5040">'+dl.length+' randevu</span>':'')+'</div>'+(dl.length?dl.map(function(a){return appCard(a,false);}).join(''):'<div style="height:6px"></div>')+'</div>';}
+      el.innerHTML=h;
+      byId('apw').addEventListener('click',function(){var dd=new Date(adminWeekBase);dd.setDate(dd.getDate()-7);adminWeekBase=dd.toISOString().split('T')[0];renderAdminContent();});
+      byId('anw').addEventListener('click',function(){var dd=new Date(adminWeekBase);dd.setDate(dd.getDate()+7);adminWeekBase=dd.toISOString().split('T')[0];renderAdminContent();});
+    } else {
+      var aa=[]; for(var p=0;p<filtered.length;p++) if(filtered[p].status!=='cancelled') aa.push(filtered[p]);
+      aa.sort(function(a,b){return a.date.localeCompare(b.date)||a.time.localeCompare(b.time)});
+      el.innerHTML=aa.length?aa.map(function(a){return appCard(a,true);}).join(''):'<div class="empty">Aktif randevu yok</div>';
+    }
+    var dels=el.querySelectorAll('[data-del]');
+    for(var q=0;q<dels.length;q++){ dels[q].addEventListener('click',function(){ var id=parseInt(this.getAttribute('data-del')); if(confirm('Randevu iptal edilsin mi?')){ db.from('randevular').update({status:'cancelled'}).eq('id',id).then(function(r){ showToast('Randevu iptal edildi','info'); loadAppointments(renderAdmin); }); } }); }
+  }
+
+  function appCard(a,showDate){
+    var b=barberById(a.barberId)||{color:'#888',avatar:'?',name:'?'}, s=serviceById(a.serviceId)||{icon:'',name:'?',price:0};
+    return '<div class="app-card'+(a.status==='pending'?' app-card-pending':'')+'"><div class="app-row"><div style="display:flex;align-items:center;gap:12px"><div class="avatar" style="background:'+b.color+';width:42px;height:42px;font-size:16px">'+b.avatar+'</div><div><div style="font-weight:600;font-size:15px;margin-bottom:3px">'+a.name+' <span class="'+(a.status==='pending'?'badge-pending':'badge-confirmed')+'">'+(a.status==='pending'?'Bekliyor':'Onaylı')+'</span></div><div style="font-size:12px;color:#8a8070;margin-bottom:2px">'+s.icon+' '+s.name+' · '+b.name+'</div><div style="font-size:12px;color:#C9A84C;margin-bottom:2px">'+(showDate?fmtDate(a.date)+' · ':'')+a.time+' · '+s.price+'₺</div><div style="font-size:12px;color:#5a5040">📞 '+a.phone+'</div></div></div><div class="app-actions"><button class="btn-del" data-del="'+a.id+'">🗑</button></div></div></div>';
+  }
+
+  function showToast(msg,type){var el=byId('toast');el.textContent=msg;el.className='toast toast-'+type;el.style.display='block';setTimeout(function(){el.style.display='none';},3500);}
+
+  // ── OLAY BAĞLAMA ─────────────────────────────────────────────────────────────
+  byId('btn-book').addEventListener('click',goBook);
+  byId('btn-admin').addEventListener('click',function(){ byId('inp-pw').value=''; showScreen('s-login'); });
+  byId('login-btn').addEventListener('click',function(){ if(byId('inp-pw').value===ADMIN_PASSWORD){ goAdmin(); } else { showToast('Yanlış şifre','error'); } });
+  byId('inp-pw').addEventListener('keypress',function(e){ if(e.key==='Enter'){ if(byId('inp-pw').value===ADMIN_PASSWORD){ goAdmin(); } else { showToast('Yanlış şifre','error'); } } });
+  byId('confirm-btn').addEventListener('click',confirmBooking);
+  byId('prev-week').addEventListener('click',function(){var d=new Date(weekBase);d.setDate(d.getDate()-7);if(d.toISOString().split('T')[0]>=todayStr()){weekBase=d.toISOString().split('T')[0];renderDateTime();}});
+  byId('next-week').addEventListener('click',function(){var d=new Date(weekBase);d.setDate(d.getDate()+7);weekBase=d.toISOString().split('T')[0];renderDateTime();});
+
+  var backBtns=document.querySelectorAll('[data-go]');
+  for(var i=0;i<backBtns.length;i++){ backBtns[i].addEventListener('click',function(){ var t=this.getAttribute('data-go'); if(t==='s-home') renderHome(); showScreen(t); }); }
+
+  var tabBtns=document.querySelectorAll('[data-tab]');
+  for(var t=0;t<tabBtns.length;t++){ tabBtns[t].addEventListener('click',function(){ adminTab=this.getAttribute('data-tab'); for(var z=0;z<tabBtns.length;z++) tabBtns[z].classList.remove('tab-active'); this.classList.add('tab-active'); renderAdminContent(); }); }
+
+  // başlat
+  renderHome();
+})();
+</script>
+</body>
+</html>
