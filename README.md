@@ -1,2 +1,1 @@
-# Berber-sistemi
-Berber sistemi
+# Berber Sistemi
