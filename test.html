@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OneSignal Test</title>
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+</head>
+<body style="font-family:sans-serif;padding:20px;background:#111;color:#fff;font-size:18px;line-height:1.6">
+<h2 style="color:#C9A84C">OneSignal Test Sayfası</h2>
+<div id="durum" style="background:#222;padding:15px;border-radius:10px;margin-top:20px;white-space:pre-wrap;border:1px solid #C9A84C">Başlatılıyor...</div>
+<button id="izinBtn" style="margin-top:20px;padding:15px 30px;font-size:18px;background:#C9A84C;color:#000;border:none;border-radius:10px;font-weight:bold">BİLDİRİME İZİN VER</button>
+
+<script>
+  var d = document.getElementById('durum');
+  function yaz(t){ d.textContent += "\n" + t; }
+
+  d.textContent = "1. Sayfa yüklendi ✓";
+
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  OneSignalDeferred.push(async function(OneSignal) {
+    yaz("2. OneSignal SDK yüklendi ✓");
+    try {
+      await OneSignal.init({
+        appId: "79ef0abd-1ced-4cea-bcc4-a25714070cea",
+        notifyButton: { enable: true },
+        allowLocalhostAsSecureOrigin: true
+      });
+      yaz("3. OneSignal.init() çalıştı ✓");
+
+      // Push destekleniyor mu
+      var destek = OneSignal.Notifications.isPushSupported();
+      yaz("4. Push destekleniyor mu: " + destek);
+
+      // İzin durumu
+      var izin = OneSignal.Notifications.permission;
+      yaz("5. İzin durumu: " + izin);
+
+      yaz("\n>>> Hazır. Aşağıdaki butona bas.");
+    } catch(e) {
+      yaz("HATA init: " + e.message);
+    }
+  });
+
+  document.getElementById('izinBtn').addEventListener('click', function(){
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    OneSignalDeferred.push(async function(OneSignal) {
+      try {
+        yaz("\n>>> İzin isteniyor...");
+        await OneSignal.Notifications.requestPermission();
+        yaz("İzin sonrası durum: " + OneSignal.Notifications.permission);
+        var id = OneSignal.User.PushSubscription.id;
+        yaz("Abonelik ID: " + (id || "YOK"));
+        if(id){ yaz("\n✅✅✅ BAŞARILI! ABONE OLDUN!"); }
+        else { yaz("\n⚠️ İzin verildi ama abonelik oluşmadı."); }
+      } catch(e) {
+        yaz("HATA izin: " + e.message);
+      }
+    });
+  });
+</script>
+</body>
+</html>
